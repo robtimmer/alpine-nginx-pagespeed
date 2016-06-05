@@ -1,5 +1,8 @@
-FROM quay.io/wunder/wunder-alpine-base
-MAINTAINER ilari.makela@wunderkraut.com
+FROM alpine
+MAINTAINER rob@robtimmer.com
+
+EXPOSE 80 443
+VOLUME ["/etc/nginx", "/etc/nginx/conf.d", "/var/www"]
 
 ENV NGINX_VERSION=1.9.15 \
     PAGESPEED_VERSION=1.11.33.1 \
@@ -44,11 +47,11 @@ RUN set -x && \
     make && \
     make install && \
     cd ${SOURCE_DIR} && \
-    wget https://raw.githubusercontent.com/iler/alpine-nginx-pagespeed/master/patches/automatic_makefile.patch && \
-    wget https://raw.githubusercontent.com/iler/alpine-nginx-pagespeed/master/patches/libpng_cflags.patch && \
-    wget https://raw.githubusercontent.com/iler/alpine-nginx-pagespeed/master/patches/pthread_nonrecursive_np.patch && \
-    wget https://raw.githubusercontent.com/iler/alpine-nginx-pagespeed/master/patches/rename_c_symbols.patch && \
-    wget https://raw.githubusercontent.com/iler/alpine-nginx-pagespeed/master/patches/stack_trace_posix.patch && \
+    wget https://raw.githubusercontent.com/robtimmer/alpine-nginx-pagespeed/master/patches/automatic_makefile.patch && \
+    wget https://raw.githubusercontent.com/robtimmer/alpine-nginx-pagespeed/master/patches/libpng_cflags.patch && \
+    wget https://raw.githubusercontent.com/robtimmer/alpine-nginx-pagespeed/master/patches/pthread_nonrecursive_np.patch && \
+    wget https://raw.githubusercontent.com/robtimmer/alpine-nginx-pagespeed/master/patches/rename_c_symbols.patch && \
+    wget https://raw.githubusercontent.com/robtimmer/alpine-nginx-pagespeed/master/patches/stack_trace_posix.patch && \
     cd ${SOURCE_DIR}/modpagespeed-${PAGESPEED_VERSION} && \
     patch -p1 -i ${SOURCE_DIR}/automatic_makefile.patch && \
     patch -p1 -i ${SOURCE_DIR}/libpng_cflags.patch && \
@@ -108,15 +111,5 @@ RUN set -x && \
     rm -rf /var/cache/apk/* && \
     ln -sf /dev/stdout /var/log/nginx/access.log && \
     ln -sf /dev/stderr /var/log/nginx/error.log
-
-# Make our nginx.conf available on the container
-ADD conf/nginx.conf /etc/nginx/nginx.conf
-
-VOLUME ["/var/log/nginx"]
-
-# Little impact in this image
-WORKDIR /app
-
-EXPOSE 80 443
-
+	
 ENTRYPOINT ["nginx", "-g", "daemon off;"]
