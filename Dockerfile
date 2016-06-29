@@ -111,7 +111,8 @@ RUN set -x && \
     rm -rf /var/cache/apk/* && \
     ln -sf /dev/stdout /var/log/nginx/access.log && \
     ln -sf /dev/stderr /var/log/nginx/error.log && \
+    mkdir /var/cache/nginx/ && \
     mkdir /var/cache/nginx/pagespeed_temp && \
-	chown nobody:nobody /var/cache/nginx/pagespeed_temp
+    chown nobody:nobody /var/cache/nginx/pagespeed_temp
 	
 ENTRYPOINT ["nginx", "-g", "daemon off;"]
